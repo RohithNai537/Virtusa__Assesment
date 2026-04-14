@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibraSync — Admin Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">📚</span>
+            <div>
+                <div class="logo-text">LibraSync</div>
+                <div class="logo-sub">Admin Panel</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+            <a class="nav-item active" onclick="showSection('dashboard')" id="nav-dashboard">
+                <span class="nav-icon">🏠</span> Dashboard
+            </a>
+
+            <div class="nav-section-label">Catalog</div>
+            <a class="nav-item" onclick="showSection('books')" id="nav-books">
+                <span class="nav-icon">📖</span> Books
+            </a>
+
+            <div class="nav-section-label">Members</div>
+            <a class="nav-item" onclick="showSection('members')" id="nav-members">
+                <span class="nav-icon">👥</span> Members
+            </a>
+
+            <div class="nav-section-label">Circulation</div>
+            <a class="nav-item" onclick="showSection('issue')" id="nav-issue">
+                <span class="nav-icon">📤</span> Issue Book
+            </a>
+            <a class="nav-item" onclick="showSection('return')" id="nav-return">
+                <span class="nav-icon">📥</span> Return Book
+            </a>
+            <a class="nav-item" onclick="showSection('transactions')" id="nav-transactions">
+                <span class="nav-icon">🔄</span> Transactions
+            </a>
+
+            <div class="nav-section-label">Reports</div>
+            <a class="nav-item" onclick="showSection('overdue')" id="nav-overdue">
+                <span class="nav-icon">⚠️</span> Overdue Books
+            </a>
+            <a class="nav-item" onclick="showSection('fines')" id="nav-fines">
+                <span class="nav-icon">💰</span> Fines
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar">A</div>
+                <div class="sidebar-user-info">
+                    <div class="user-name">Administrator</div>
+                    <div class="user-role">System Admin</div>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="logout()">🚪 Sign Out</button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="topbar">
+            <div style="display:flex;align-items:center;gap:14px">
+                <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+                <div class="topbar-title">
+                    <h2 id="pageTitle">Dashboard</h2>
+                    <p id="pageDesc">Overview of library operations</p>
+                </div>
+            </div>
+            <div class="topbar-actions">
+                <span class="topbar-date" id="topbarDate"></span>
+                <button class="btn btn-primary btn-sm" onclick="showSection('issue')">+ Issue Book</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- ===== DASHBOARD ===== -->
+            <section class="page-section active" id="section-dashboard">
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">📚</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Total Books</div>
+                            <div class="stat-value" id="stat-totalBooks">—</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">✅</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Available</div>
+                            <div class="stat-value" id="stat-availBooks">—</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon amber">👥</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Members</div>
+                            <div class="stat-value" id="stat-members">—</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon red">⚠️</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Overdue</div>
+                            <div class="stat-value" id="stat-overdue">—</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Recent Transactions</h3>
+                            <a class="btn btn-outline btn-sm" onclick="showSection('transactions')">View All</a>
+                        </div>
+                        <div class="card-body" style="padding:0">
+                            <div class="table-wrap">
+                                <table>
+                                    <thead><tr><th>Book</th><th>Member</th><th>Date</th><th>Status</th></tr></thead>
+                                    <tbody id="recentTxTable">
+                                        <tr><td colspan="4" style="text-align:center;padding:30px;color:#94a3b8">Loading...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Overdue Alerts</h3>
+                            <a class="btn btn-outline btn-sm" onclick="showSection('overdue')">View All</a>
+                        </div>
+                        <div class="card-body" style="padding:0">
+                            <div class="table-wrap">
+                                <table>
+                                    <thead><tr><th>Book</th><th>Member</th><th>Due</th><th>Fine</th></tr></thead>
+                                    <tbody id="overdueTableDash">
+                                        <tr><td colspan="4" style="text-align:center;padding:30px;color:#94a3b8">Loading...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== BOOKS ===== -->
+            <section class="page-section" id="section-books">
+                <div class="toolbar">
+                    <div class="search-bar">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="bookSearch" placeholder="Search by title, author, ISBN..." oninput="filterBooks()">
+                    </div>
+                    <select id="catFilter" class="form-field" style="padding:10px 12px;border:1.5px solid var(--border);border-radius:30px;font-size:13px;min-width:160px" onchange="filterBooks()">
+                        <option value="">All Categories</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Fiction">Fiction</option>
+                        <option value="Non-Fiction">Non-Fiction</option>
+                        <option value="Classics">Classics</option>
+                        <option value="Science">Science</option>
+                        <option value="History">History</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="openAddBook()">+ Add Book</button>
+                </div>
+                <div class="card">
+                    <div class="card-body" style="padding:0">
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>ISBN</th>
+                                        <th>Title</th>
+                                        <th>Author</th>
+                                        <th>Category</th>
+                                        <th>Total</th>
+                                        <th>Available</th>
+                                        <th>Year</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="booksTable">
+                                    <tr><td colspan="10" style="text-align:center;padding:40px"><div class="spinner"></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== MEMBERS ===== -->
+            <section class="page-section" id="section-members">
+                <div class="toolbar">
+                    <div class="search-bar">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="memberSearch" placeholder="Search members..." oninput="filterMembers()">
+                    </div>
+                    <button class="btn btn-primary" onclick="openAddMember()">+ Add Member</button>
+                </div>
+                <div class="card">
+                    <div class="card-body" style="padding:0">
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Member ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Type</th>
+                                        <th>Joined</th>
+                                        <th>Expiry</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="membersTable">
+                                    <tr><td colspan="9" style="text-align:center;padding:40px"><div class="spinner"></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== ISSUE BOOK ===== -->
+            <section class="page-section" id="section-issue">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><h3>📤 Issue Book</h3></div>
+                        <div class="card-body">
+                            <div id="issueAlert"></div>
+                            <div class="form-grid" style="grid-template-columns:1fr">
+                                <div class="form-field">
+                                    <label>Select Member *</label>
+                                    <select id="issueMember">
+                                        <option value="">-- Select Member --</option>
+                                    </select>
+                                </div>
+                                <div class="form-field">
+                                    <label>Select Book *</label>
+                                    <select id="issueBook">
+                                        <option value="">-- Select Book --</option>
+                                    </select>
+                                </div>
+                                <div class="form-field">
+                                    <label>Issue Date</label>
+                                    <input type="date" id="issueDate" readonly>
+                                </div>
+                                <div class="form-field">
+                                    <label>Due Date (14 days)</label>
+                                    <input type="date" id="issueDueDate" readonly>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="issueBook()">📤 Issue Book</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h3>Currently Issued</h3></div>
+                        <div class="card-body" style="padding:0">
+                            <div class="table-wrap">
+                                <table>
+                                    <thead><tr><th>Book</th><th>Member</th><th>Due</th><th>Days Left</th></tr></thead>
+                                    <tbody id="issuedBooksTable"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== RETURN BOOK ===== -->
+            <section class="page-section" id="section-return">
+                <div class="card" style="max-width:700px;margin:0 auto">
+                    <div class="card-header"><h3>📥 Return Book</h3></div>
+                    <div class="card-body">
+                        <div id="returnAlert"></div>
+                        <div class="form-field" style="margin-bottom:16px">
+                            <label>Select Transaction to Return *</label>
+                            <select id="returnTransaction">
+                                <option value="">-- Select Issued Book --</option>
+                            </select>
+                        </div>
+                        <div id="returnDetails" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px">
+                            <h4 style="margin-bottom:12px;color:var(--primary)">Return Details</h4>
+                            <div class="grid-2">
+                                <div><span style="color:var(--text-muted);font-size:12px">Book</span><p id="rd-book" style="font-weight:600"></p></div>
+                                <div><span style="color:var(--text-muted);font-size:12px">Member</span><p id="rd-member" style="font-weight:600"></p></div>
+                                <div><span style="color:var(--text-muted);font-size:12px">Issue Date</span><p id="rd-issue"></p></div>
+                                <div><span style="color:var(--text-muted);font-size:12px">Due Date</span><p id="rd-due"></p></div>
+                                <div><span style="color:var(--text-muted);font-size:12px">Return Date</span><p id="rd-return" style="font-weight:600"></p></div>
+                                <div><span style="color:var(--text-muted);font-size:12px">Fine Amount</span><p id="rd-fine" style="font-weight:700;font-size:18px"></p></div>
+                            </div>
+                        </div>
+                        <button class="btn btn-success" style="width:100%" onclick="returnBook()">📥 Confirm Return</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== TRANSACTIONS ===== -->
+            <section class="page-section" id="section-transactions">
+                <div class="toolbar">
+                    <div class="search-bar">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="txSearch" placeholder="Search transactions..." oninput="filterTransactions()">
+                    </div>
+                    <select id="txStatus" style="padding:10px 12px;border:1.5px solid var(--border);border-radius:30px;font-size:13px" onchange="filterTransactions()">
+                        <option value="">All Status</option>
+                        <option value="ISSUED">Issued</option>
+                        <option value="RETURNED">Returned</option>
+                        <option value="OVERDUE">Overdue</option>
+                    </select>
+                </div>
+                <div class="card">
+                    <div class="card-body" style="padding:0">
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Book</th>
+                                        <th>Member</th>
+                                        <th>Issue Date</th>
+                                        <th>Due Date</th>
+                                        <th>Return Date</th>
+                                        <th>Status</th>
+                                        <th>Fine</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="txTable">
+                                    <tr><td colspan="8" style="text-align:center;padding:40px"><div class="spinner"></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== OVERDUE ===== -->
+            <section class="page-section" id="section-overdue">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>⚠️ Overdue Books</h3>
+                        <span class="badge badge-overdue" id="overdueCount">Loading...</span>
+                    </div>
+                    <div class="card-body" style="padding:0">
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Book</th>
+                                        <th>Member</th>
+                                        <th>Member ID</th>
+                                        <th>Due Date</th>
+                                        <th>Days Overdue</th>
+                                        <th>Fine (₹)</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="overdueTable">
+                                    <tr><td colspan="8" style="text-align:center;padding:40px"><div class="spinner"></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== FINES ===== -->
+            <section class="page-section" id="section-fines">
+                <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+                    <div class="stat-card">
+                        <div class="stat-icon red">💰</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Total Fines Collected</div>
+                            <div class="stat-value" id="totalFines">₹0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon amber">⏳</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Pending Fines</div>
+                            <div class="stat-value" id="pendingFines">₹0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple">📊</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Rate per Day</div>
+                            <div class="stat-value">₹2</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3>Fine Records</h3></div>
+                    <div class="card-body" style="padding:0">
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr><th>#</th><th>Book</th><th>Member</th><th>Due Date</th><th>Return Date</th><th>Days Late</th><th>Fine (₹)</th><th>Status</th></tr>
+                                </thead>
+                                <tbody id="finesTable">
+                                    <tr><td colspan="8" style="text-align:center;padding:40px"><div class="spinner"></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+
+<!-- ============ MODALS ============ -->
+
+<!-- Add/Edit Book Modal -->
+<div class="modal-overlay" id="bookModal">
+    <div class="modal modal-lg">
+        <div class="modal-header">
+            <h3 id="bookModalTitle">Add New Book</h3>
+            <button class="modal-close" onclick="closeModal('bookModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="bookId">
+            <div class="form-grid">
+                <div class="form-field"><label>ISBN *</label><input type="text" id="bookIsbn" placeholder="978-0132350884"></div>
+                <div class="form-field"><label>Title *</label><input type="text" id="bookTitle" placeholder="Book Title"></div>
+                <div class="form-field"><label>Author *</label><input type="text" id="bookAuthor" placeholder="Author Name"></div>
+                <div class="form-field">
+                    <label>Category *</label>
+                    <select id="bookCategory">
+                        <option value="">Select Category</option>
+                        <option>Technology</option><option>Fiction</option><option>Non-Fiction</option>
+                        <option>Classics</option><option>Science</option><option>History</option>
+                        <option>Mathematics</option><option>Philosophy</option><option>Biography</option>
+                    </select>
+                </div>
+                <div class="form-field"><label>Total Copies *</label><input type="number" id="bookCopies" value="1" min="1"></div>
+                <div class="form-field"><label>Publish Year</label><input type="number" id="bookYear" placeholder="2024"></div>
+                <div class="form-field span-2"><label>Publisher</label><input type="text" id="bookPublisher" placeholder="Publisher Name"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('bookModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveBook()">💾 Save Book</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Member Modal -->
+<div class="modal-overlay" id="memberModal">
+    <div class="modal modal-lg">
+        <div class="modal-header">
+            <h3 id="memberModalTitle">Add New Member</h3>
+            <button class="modal-close" onclick="closeModal('memberModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="memberId_field">
+            <div class="form-grid">
+                <div class="form-field"><label>Full Name *</label><input type="text" id="memberName" placeholder="John Doe"></div>
+                <div class="form-field"><label>Email *</label><input type="email" id="memberEmail" placeholder="john@example.com"></div>
+                <div class="form-field"><label>Phone *</label><input type="tel" id="memberPhone" placeholder="9876543210"></div>
+                <div class="form-field">
+                    <label>Membership Type</label>
+                    <select id="memberType">
+                        <option value="STUDENT">Student</option>
+                        <option value="FACULTY">Faculty</option>
+                        <option value="PUBLIC">Public</option>
+                    </select>
+                </div>
+                <div class="form-field"><label>Password *</label><input type="password" id="memberPassword" placeholder="Password"></div>
+                <div class="form-field">
+                    <label>Status</label>
+                    <select id="memberStatus"><option value="ACTIVE">Active</option><option value="SUSPENDED">Suspended</option></select>
+                </div>
+                <div class="form-field span-2"><label>Address</label><textarea id="memberAddress" placeholder="Full address"></textarea></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('memberModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveMember()">💾 Save Member</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/app.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>

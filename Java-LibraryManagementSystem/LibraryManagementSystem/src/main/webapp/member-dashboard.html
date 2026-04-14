@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibraSync — Member Portal</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">📚</span>
+            <div>
+                <div class="logo-text">LibraSync</div>
+                <div class="logo-sub">Member Portal</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+            <a class="nav-item active" onclick="showMemberSection('home')" id="nav-home"><span class="nav-icon">🏠</span> Home</a>
+            <div class="nav-section-label">Library</div>
+            <a class="nav-item" onclick="showMemberSection('catalog')" id="nav-catalog"><span class="nav-icon">📚</span> Browse Books</a>
+            <a class="nav-item" onclick="showMemberSection('my-books')" id="nav-my-books"><span class="nav-icon">📖</span> My Books</a>
+            <a class="nav-item" onclick="showMemberSection('history')" id="nav-history"><span class="nav-icon">🕐</span> History</a>
+            <a class="nav-item" onclick="showMemberSection('fines')" id="nav-fines"><span class="nav-icon">💰</span> My Fines</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar">R</div>
+                <div class="sidebar-user-info">
+                    <div class="user-name">Rahul Sharma</div>
+                    <div class="user-role">Student Member</div>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="logout()">🚪 Sign Out</button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="topbar">
+            <div style="display:flex;align-items:center;gap:14px">
+                <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+                <div class="topbar-title">
+                    <h2 id="mPageTitle">Welcome Back!</h2>
+                    <p id="mPageDesc">Your library dashboard</p>
+                </div>
+            </div>
+            <div class="topbar-actions">
+                <span class="topbar-date" id="topbarDate"></span>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- HOME -->
+            <section class="page-section active" id="section-home">
+                <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">📖</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Books Issued</div>
+                            <div class="stat-value" id="m-issued">2</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon red">⚠️</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Overdue</div>
+                            <div class="stat-value" id="m-overdue">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon amber">💰</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Pending Fine</div>
+                            <div class="stat-value" id="m-fine">₹0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Currently Issued Books</h3>
+                        <a class="btn btn-outline btn-sm" onclick="showMemberSection('catalog')">Browse Books</a>
+                    </div>
+                    <div class="card-body" style="padding:0">
+                        <table>
+                            <thead><tr><th>Book</th><th>Author</th><th>Issue Date</th><th>Due Date</th><th>Status</th></tr></thead>
+                            <tbody id="m-issuedTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CATALOG -->
+            <section class="page-section" id="section-catalog">
+                <div class="toolbar">
+                    <div class="search-bar">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="catalogSearch" placeholder="Search books by title, author, ISBN..." oninput="filterCatalog()">
+                    </div>
+                    <select id="catalogCat" style="padding:10px 12px;border:1.5px solid var(--border);border-radius:30px;font-size:13px;min-width:160px" onchange="filterCatalog()">
+                        <option value="">All Categories</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Fiction">Fiction</option>
+                        <option value="Non-Fiction">Non-Fiction</option>
+                        <option value="Classics">Classics</option>
+                        <option value="Science">Science</option>
+                    </select>
+                </div>
+                <div class="card">
+                    <div class="card-body" style="padding:0">
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr><th>Title</th><th>Author</th><th>Category</th><th>Year</th><th>Available</th></tr>
+                                </thead>
+                                <tbody id="catalogTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MY BOOKS -->
+            <section class="page-section" id="section-my-books">
+                <div class="card">
+                    <div class="card-header"><h3>📖 My Currently Issued Books</h3></div>
+                    <div class="card-body" style="padding:0">
+                        <table>
+                            <thead><tr><th>Book</th><th>Author</th><th>Issued On</th><th>Due Date</th><th>Days Left</th><th>Status</th></tr></thead>
+                            <tbody id="m-myBooksTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- HISTORY -->
+            <section class="page-section" id="section-history">
+                <div class="card">
+                    <div class="card-header"><h3>🕐 Borrowing History</h3></div>
+                    <div class="card-body" style="padding:0">
+                        <table>
+                            <thead><tr><th>Book</th><th>Issue Date</th><th>Due Date</th><th>Return Date</th><th>Status</th><th>Fine</th></tr></thead>
+                            <tbody id="m-histTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FINES -->
+            <section class="page-section" id="section-fines">
+                <div class="card" style="max-width:700px">
+                    <div class="card-header"><h3>💰 My Fines</h3></div>
+                    <div class="card-body" style="padding:0">
+                        <table>
+                            <thead><tr><th>Book</th><th>Due Date</th><th>Return Date</th><th>Days Late</th><th>Fine</th><th>Status</th></tr></thead>
+                            <tbody id="m-finesTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/app.js"></script>
+<script>
+const MEMBER_ID = 2; // Rahul Sharma
+
+function showMemberSection(name) {
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('section-' + name)?.classList.add('active');
+    document.getElementById('nav-' + name)?.classList.add('active');
+    const titles = {
+        home: ['Welcome Back, Rahul!', 'Your library dashboard'],
+        catalog: ['Browse Books', 'Explore our book collection'],
+        'my-books': ['My Books', 'Currently issued books'],
+        history: ['Borrowing History', 'All past transactions'],
+        fines: ['My Fines', 'Fine records and dues']
+    };
+    const [t, d] = titles[name] || ['Dashboard', ''];
+    document.getElementById('mPageTitle').textContent = t;
+    document.getElementById('mPageDesc').textContent = d;
+    if (name === 'home') loadHome();
+    else if (name === 'catalog') loadCatalog();
+    else if (name === 'my-books') loadMyBooks();
+    else if (name === 'history') loadHistory();
+    else if (name === 'fines') loadMFines();
+}
+
+function loadHome() {
+    const myTx = DB.transactions.filter(t => t.userId === MEMBER_ID);
+    const issued = myTx.filter(t => t.status === 'ISSUED');
+    const overdue = issued.filter(t => new Date(t.dueDate) < new Date());
+    const fine = overdue.reduce((a, t) => a + calcFine(t.dueDate, null), 0);
+    document.getElementById('m-issued').textContent = issued.length;
+    document.getElementById('m-overdue').textContent = overdue.length;
+    document.getElementById('m-fine').textContent = '₹' + fine;
+
+    const tbody = document.getElementById('m-issuedTable');
+    tbody.innerHTML = issued.length ? issued.map(t => {
+        const days = daysBetween(today(), t.dueDate);
+        const status = days < 0 ? 'OVERDUE' : 'ISSUED';
+        return `<tr class="${days < 0 ? 'overdue-row' : ''}">
+            <td><strong>${t.bookTitle}</strong></td>
+            <td>${DB.books.find(b=>b.id===t.bookId)?.author||'—'}</td>
+            <td>${formatDate(t.issueDate)}</td>
+            <td>${formatDate(t.dueDate)}</td>
+            <td>${statusBadge(status)}</td>
+        </tr>`;
+    }).join('') : '<tr><td colspan="5" style="text-align:center;padding:20px;color:#94a3b8">No books currently issued</td></tr>';
+}
+
+let catalogBooks = [];
+function loadCatalog() {
+    catalogBooks = [...DB.books];
+    renderCatalog(catalogBooks);
+}
+function renderCatalog(books) {
+    const tbody = document.getElementById('catalogTable');
+    tbody.innerHTML = books.map(b => `
+        <tr>
+            <td><strong>${b.title}</strong><br><small style="color:#94a3b8">${b.isbn}</small></td>
+            <td>${b.author}</td>
+            <td>${catBadge(b.category)}</td>
+            <td>${b.publishYear > 0 ? b.publishYear : 'Ancient'}</td>
+            <td><span style="color:${b.availableCopies > 0 ? 'var(--success)' : 'var(--danger)'};font-weight:700">
+                ${b.availableCopies > 0 ? b.availableCopies + ' Available' : 'Not Available'}
+            </span></td>
+        </tr>`).join('');
+}
+function filterCatalog() {
+    const q = document.getElementById('catalogSearch').value.toLowerCase();
+    const cat = document.getElementById('catalogCat').value;
+    renderCatalog(catalogBooks.filter(b =>
+        (!q || b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q) || b.isbn.includes(q)) &&
+        (!cat || b.category === cat)
+    ));
+}
+
+function loadMyBooks() {
+    const issued = DB.transactions.filter(t => t.userId === MEMBER_ID && t.status === 'ISSUED');
+    const tbody = document.getElementById('m-myBooksTable');
+    tbody.innerHTML = issued.length ? issued.map(t => {
+        const days = daysBetween(today(), t.dueDate);
+        const daysText = days >= 0 ? `<span style="color:var(--success)">${days}d left</span>` : `<span style="color:var(--danger)">${Math.abs(days)}d overdue</span>`;
+        return `<tr class="${days < 0 ? 'overdue-row' : ''}">
+            <td><strong>${t.bookTitle}</strong></td>
+            <td>${DB.books.find(b=>b.id===t.bookId)?.author||'—'}</td>
+            <td>${formatDate(t.issueDate)}</td>
+            <td>${formatDate(t.dueDate)}</td>
+            <td>${daysText}</td>
+            <td>${statusBadge(days < 0 ? 'OVERDUE' : 'ISSUED')}</td>
+        </tr>`;
+    }).join('') : '<tr><td colspan="6" style="text-align:center;padding:30px;color:#94a3b8">No books currently issued</td></tr>';
+}
+
+function loadHistory() {
+    const hist = DB.transactions.filter(t => t.userId === MEMBER_ID).sort((a,b) => new Date(b.issueDate)-new Date(a.issueDate));
+    const tbody = document.getElementById('m-histTable');
+    tbody.innerHTML = hist.length ? hist.map(t => `
+        <tr>
+            <td><strong>${t.bookTitle}</strong></td>
+            <td>${formatDate(t.issueDate)}</td>
+            <td>${formatDate(t.dueDate)}</td>
+            <td>${formatDate(t.returnDate)}</td>
+            <td>${statusBadge(t.status)}</td>
+            <td>${t.fine > 0 ? '<span class="fine-amount">₹'+t.fine+'</span>' : '—'}</td>
+        </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;padding:30px;color:#94a3b8">No history</td></tr>';
+}
+
+function loadMFines() {
+    const fines = DB.transactions.filter(t => t.userId === MEMBER_ID && (t.fine > 0 || (t.status==='ISSUED' && new Date(t.dueDate)<new Date())));
+    const tbody = document.getElementById('m-finesTable');
+    tbody.innerHTML = fines.length ? fines.map(t => {
+        const fine = t.fine || calcFine(t.dueDate, null);
+        const daysLate = t.returnDate ? daysBetween(t.dueDate, t.returnDate) : daysBetween(t.dueDate, today());
+        return `<tr>
+            <td>${t.bookTitle}</td>
+            <td>${formatDate(t.dueDate)}</td>
+            <td>${formatDate(t.returnDate)}</td>
+            <td>${Math.max(0,daysLate)}</td>
+            <td class="fine-amount">₹${fine}</td>
+            <td>${statusBadge(t.status)}</td>
+        </tr>`;
+    }).join('') : '<tr><td colspan="6" style="text-align:center;padding:30px;color:#94a3b8">No fines! 🎉</td></tr>';
+}
+
+loadHome();
+</script>
+</body>
+</html>
